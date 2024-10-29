@@ -17,7 +17,7 @@ namespace UnitTests.Migrations
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.10");
 
-            modelBuilder.Entity("DAL.Entities.Address", b =>
+            modelBuilder.Entity("Common.Entities.Address", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -31,6 +31,7 @@ namespace UnitTests.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("CityName")
+                        .IsRequired()
                         .HasMaxLength(200)
                         .HasColumnType("TEXT");
 
@@ -96,7 +97,7 @@ namespace UnitTests.Migrations
                     b.ToTable("Addresses");
                 });
 
-            modelBuilder.Entity("DAL.Entities.Country", b =>
+            modelBuilder.Entity("Common.Entities.Country", b =>
                 {
                     b.Property<int>("Id")
                         .HasColumnType("INTEGER");
@@ -116,7 +117,7 @@ namespace UnitTests.Migrations
                     b.ToTable("Countries");
                 });
 
-            modelBuilder.Entity("DAL.Entities.County", b =>
+            modelBuilder.Entity("Common.Entities.County", b =>
                 {
                     b.Property<int>("Id")
                         .HasColumnType("INTEGER");
@@ -136,13 +137,10 @@ namespace UnitTests.Migrations
                     b.ToTable("Counties");
                 });
 
-            modelBuilder.Entity("DAL.Entities.Person", b =>
+            modelBuilder.Entity("Common.Entities.Person", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int?>("AddressId")
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("FirstName")
@@ -164,17 +162,17 @@ namespace UnitTests.Migrations
                     b.ToTable("Persons");
                 });
 
-            modelBuilder.Entity("DAL.Entities.Address", b =>
+            modelBuilder.Entity("Common.Entities.Address", b =>
                 {
-                    b.HasOne("DAL.Entities.Country", "Country")
+                    b.HasOne("Common.Entities.Country", "Country")
                         .WithMany("Addresses")
                         .HasForeignKey("CountryId");
 
-                    b.HasOne("DAL.Entities.County", "County")
+                    b.HasOne("Common.Entities.County", "County")
                         .WithMany("Addresses")
                         .HasForeignKey("CountyId");
 
-                    b.HasOne("DAL.Entities.Person", "Person")
+                    b.HasOne("Common.Entities.Person", "Person")
                         .WithMany("Addresses")
                         .HasForeignKey("PersonId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -187,9 +185,9 @@ namespace UnitTests.Migrations
                     b.Navigation("Person");
                 });
 
-            modelBuilder.Entity("DAL.Entities.County", b =>
+            modelBuilder.Entity("Common.Entities.County", b =>
                 {
-                    b.HasOne("DAL.Entities.Country", "Country")
+                    b.HasOne("Common.Entities.Country", "Country")
                         .WithMany("Counties")
                         .HasForeignKey("CountryId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -198,19 +196,19 @@ namespace UnitTests.Migrations
                     b.Navigation("Country");
                 });
 
-            modelBuilder.Entity("DAL.Entities.Country", b =>
+            modelBuilder.Entity("Common.Entities.Country", b =>
                 {
                     b.Navigation("Addresses");
 
                     b.Navigation("Counties");
                 });
 
-            modelBuilder.Entity("DAL.Entities.County", b =>
+            modelBuilder.Entity("Common.Entities.County", b =>
                 {
                     b.Navigation("Addresses");
                 });
 
-            modelBuilder.Entity("DAL.Entities.Person", b =>
+            modelBuilder.Entity("Common.Entities.Person", b =>
                 {
                     b.Navigation("Addresses");
                 });

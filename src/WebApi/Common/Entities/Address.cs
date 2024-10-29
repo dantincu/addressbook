@@ -10,7 +10,7 @@ namespace Common.Entities
     {
         public string? CountryName { get; set; }
         public string? CountyName { get; set; }
-        public string? CityName { get; set; }
+        public string CityName { get; set; }
 
         public string StreetType { get; set; }
         public string StreetName { get; set; }

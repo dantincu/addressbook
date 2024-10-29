@@ -1,5 +1,7 @@
 ﻿using Common.Database;
+using Dependencies.Registration;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,18 +13,6 @@ namespace UnitTests.UnitTests
 {
     public class UnitTestBase
     {
-        static UnitTestBase()
-        {
-            using (var ctx = new MyDbContextFactory(
-                ).CreateDbContext([nameof(DbConnectionType.UnitTestDev)]))
-            {
-                ctx.Database.Migrate();
-            }
-        }
-
-        public UnitTestBase()
-        {
-
-        }
+        protected static IServiceProvider SvcProv => DependencyRoot.Instance.Value.SvcProv;
     }
 }

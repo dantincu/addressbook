@@ -10,6 +10,8 @@ using Common.Database;
 using DAL.Database;
 using DAL.Helpers;
 using DAL.Repositories;
+using Common.Services;
+using BL.Services;
 
 namespace Dependencies.Registration
 {
@@ -18,10 +20,14 @@ namespace Dependencies.Registration
         public const string CONNECTION_STRING_SUFFIX = "Connection";
 
         public static void RegisterAllDependencies(
-            IServiceCollection services,
-            IConfiguration config)
+            IServiceCollection services)
         {
+            services.AddScoped<IAddressService, AddressService>();
             services.AddScoped<IRepositoryFactory, RepositoryFactory>();
+            services.AddScoped<IPersonRepository, PersonRepository>();
+            services.AddScoped<IAddressRepository, AddressRepository>();
+            services.AddScoped<ICountryRepository, CountryRepository>();
+            services.AddScoped<ICountyRepository, CountyRepository>();
         }
 
         public static void RegisterAllDependencies(
@@ -36,7 +42,7 @@ namespace Dependencies.Registration
                 migrationsAssemblyName,
                 dbConnectionType);
 
-            RegisterAllDependencies(services, config);
+            RegisterAllDependencies(services);
         }
 
         public static void RegisterAppDbContext(

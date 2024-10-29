@@ -13,12 +13,20 @@ namespace Common.Database
     {
         string IdPropName { get; }
 
+        IAppDbContext GetDbContext();
+
         void Add(TEntity entity);
         void Update(TEntity entity);
         void Delete(TEntity entity);
 
+        Task<int> DeleteAsync(TPk id);
+
         IQueryable<TEntity> Query(
             Expression<Func<TEntity, bool>> filter);
+
+        IQueryable<TResult> Query<TResult>(
+            Expression<Func<TEntity, bool>> filter,
+            Expression<Func<TEntity, TResult>> selector);
 
         Task<TEntity?> GetAsync(TPk id);
         Task<TEntity> GetRequiredAsync(TPk id);
@@ -35,7 +43,11 @@ namespace Common.Database
         Task<TEntity> GetRequiredSingleAsync(
             Expression<Func<TEntity, bool>> filter);
 
-        Task<TEntity[]> GetFilteredAsync(
+        Task<TEntity[]> GetQueryAsync(
             Expression<Func<TEntity, bool>> filter);
+
+        Task<TResult[]> GetQueryAsync<TResult>(
+            Expression<Func<TEntity, bool>> filter,
+            Expression<Func<TEntity, TResult>> selector);
     }
 }

@@ -1,5 +1,6 @@
 using Common.Database;
 using Common.Entities;
+using Common.Services;
 using DAL.Database;
 using DAL.Repositories;
 using Microsoft.EntityFrameworkCore;
@@ -10,7 +11,7 @@ using UnitTests.Database;
 
 namespace UnitTests.UnitTests
 {
-    public class AppDbContextUnitTest : UnitTestBase
+    public partial class AppDbContextUnitTest : UnitTestBase
     {
         [Fact]
         public void CountCountriesTest()
@@ -58,7 +59,7 @@ namespace UnitTests.UnitTests
             Func<BasicRepository<Person, int>, Repository<Person, int>, Task> assertAction = async (
                 basicRepo, repo) =>
             {
-                var allPersons = await repo.GetFilteredAsync(e => true);
+                var allPersons = await repo.GetQueryAsync(e => true);
 
                 await GetAndAssertAreEqual(
                     repo, person1, AssertEntitiesAreEqualCore);
@@ -149,6 +150,7 @@ namespace UnitTests.UnitTests
 
             var address2 = new Address
             {
+                CityName = "Montgomery",
                 StreetType = "St.",
                 StreetName = "Broadway",
                 StreetNumber = "65",
@@ -185,7 +187,7 @@ namespace UnitTests.UnitTests
             Func<BasicRepository<Person, int>, Repository<Person, int>, Task> assertAction = async (
                 basicRepo, repo) =>
             {
-                var allPersons = await repo.GetFilteredAsync(e => true);
+                var allPersons = await repo.GetQueryAsync(e => true);
 
                 await GetAndAssertAreEqual(
                     repo, person1, AssertEntitiesAreEqual);

@@ -9,6 +9,8 @@ namespace Common.Database
 {
     public interface IRepositoryFactory
     {
+        IAppDbContext GetDbContext();
+
         IRepository<TEntity, TPk> Repository<TEntity, TPk>()
             where TEntity : EntityBase<TPk>
             where TPk : IEquatable<TPk>;

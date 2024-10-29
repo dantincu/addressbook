@@ -20,6 +20,8 @@ namespace DAL.Repositories
 
         public AppDbContext DbContext { get; }
 
+        public IAppDbContext GetDbContext() => DbContext;
+
         public IRepository<TEntity, TPk> Repository<TEntity, TPk>()
             where TEntity : EntityBase<TPk>
             where TPk : IEquatable<TPk> => new Repository<TEntity, TPk>(DbContext);

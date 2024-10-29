@@ -12,8 +12,6 @@ namespace Common.Entities
         public string? MiddleName { get; set; }
         public string LastName { get; set; }
 
-        public int? AddressId { get; set; }
-
         public List<Address> Addresses { get; set; }
     }
 }

@@ -33,8 +33,7 @@ namespace UnitTests.Migrations
                         .Annotation("Sqlite:Autoincrement", true),
                     FirstName = table.Column<string>(type: "TEXT", maxLength: 200, nullable: false),
                     MiddleName = table.Column<string>(type: "TEXT", maxLength: 200, nullable: true),
-                    LastName = table.Column<string>(type: "TEXT", maxLength: 200, nullable: false),
-                    AddressId = table.Column<int>(type: "INTEGER", nullable: true)
+                    LastName = table.Column<string>(type: "TEXT", maxLength: 200, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -68,7 +67,7 @@ namespace UnitTests.Migrations
                         .Annotation("Sqlite:Autoincrement", true),
                     CountryName = table.Column<string>(type: "TEXT", maxLength: 200, nullable: true),
                     CountyName = table.Column<string>(type: "TEXT", maxLength: 200, nullable: true),
-                    CityName = table.Column<string>(type: "TEXT", maxLength: 200, nullable: true),
+                    CityName = table.Column<string>(type: "TEXT", maxLength: 200, nullable: false),
                     StreetType = table.Column<string>(type: "TEXT", maxLength: 200, nullable: false),
                     StreetName = table.Column<string>(type: "TEXT", maxLength: 200, nullable: false),
                     StreetNumber = table.Column<string>(type: "TEXT", maxLength: 200, nullable: false),
@@ -126,7 +125,7 @@ namespace UnitTests.Migrations
 
             new InitialDataInsertComponent(
                 ).InsertInitialData(
-                migrationBuilder);
+                    migrationBuilder);
         }
 
         /// <inheritdoc />

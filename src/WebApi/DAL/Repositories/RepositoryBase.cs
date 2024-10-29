@@ -29,6 +29,8 @@ namespace DAL.Repositories
 
         protected AppDbContext DbContext { get; }
 
+        public IAppDbContext GetDbContext() => DbContext;
+
         public virtual DbSet<TEntity> GetDbSet(
             AppDbContext dbContext) => dbContext.Set<TEntity>();
 
@@ -40,9 +42,21 @@ namespace DAL.Repositories
             return query;
         }
 
-        public void Add(TEntity entity)
+        public IQueryable<TResult> Query<TResult>(
+            Expression<Func<TEntity, bool>> filter,
+            Expression<Func<TEntity, TResult>> selector)
         {
             var dbSet = GetDbSet(DbContext);
+            var query = dbSet.Where(filter);
+            var retQuery = query.Select(selector);
+            return retQuery;
+        }
+
+        public void Add(TEntity entity)
+        {
+            var dbSet = GetDbSet(
+                DbContext);
+
             dbSet.Add(entity);
         }
 
@@ -56,7 +70,19 @@ namespace DAL.Repositories
         public void Delete(TEntity entity)
         {
             var dbSet = GetDbSet(DbContext);
-            dbSet.Remove(entity);
+            var attached = dbSet.Attach(entity);
+            attached.State = EntityState.Deleted;
+        }
+
+        public async Task<int> DeleteAsync(TPk id)
+        {
+            var dbSet = GetDbSet(DbContext);
+
+            var query = Query(
+                GetFilterByIdLambdaExpr(id));
+
+            int result = await query.ExecuteDeleteAsync();
+            return result;
         }
 
         public Task<TEntity?> GetAsync(
@@ -77,10 +103,20 @@ namespace DAL.Repositories
         public Task<TEntity> GetRequiredSingleAsync(
             Expression<Func<TEntity, bool>> filter) => GetSingleAsyncCore(filter, true)!;
 
-        public async Task<TEntity[]> GetFilteredAsync(
+        public async Task<TEntity[]> GetQueryAsync(
             Expression<Func<TEntity, bool>> filter)
         {
             var query = Query(filter);
+            var entitiesArr = await query.ToArrayAsync();
+
+            return entitiesArr;
+        }
+
+        public async Task<TResult[]> GetQueryAsync<TResult>(
+            Expression<Func<TEntity, bool>> filter,
+            Expression<Func<TEntity, TResult>> selector)
+        {
+            var query = Query(filter, selector);
             var entitiesArr = await query.ToArrayAsync();
 
             return entitiesArr;
