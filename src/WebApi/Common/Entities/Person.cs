@@ -4,12 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DAL.Entities
+namespace Common.Entities
 {
-    public class Person
+    public class Person : EntityBase<int>
     {
-        public int Id { get; set; }
-
         public string FirstName { get; set; }
         public string? MiddleName { get; set; }
         public string LastName { get; set; }

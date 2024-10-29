@@ -1,4 +1,5 @@
-﻿using DAL.Entities;
+﻿using Common.Database;
+using Common.Entities;
 using DAL.Mapping;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -10,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace DAL.Database
 {
-    public class AppDbContext : DbContext
+    public class AppDbContext : DbContext, IAppDbContext
     {
         public AppDbContext(
             DbContextOptions<AppDbContext> opts) : base(opts)
@@ -34,5 +35,11 @@ namespace DAL.Database
             CountyMapper.AddMappings(modelBuilder);
             CountryMapper.AddMappings(modelBuilder);
         }
+
+        public Task<int> SaveChangesAsync(
+            ) => base.SaveChangesAsync();
+
+        public int ExecuteDelete<TEntity>(
+            IQueryable<TEntity> query) => query.ExecuteDelete();
     }
 }

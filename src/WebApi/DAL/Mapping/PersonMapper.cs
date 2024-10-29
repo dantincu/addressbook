@@ -1,4 +1,4 @@
-﻿using DAL.Entities;
+﻿using Common.Entities;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -13,9 +13,8 @@ namespace DAL.Mapping
         public static void AddMappings(
             ModelBuilder modelBuilder)
         {
-            var entity = modelBuilder.Entity<Person>();
-            entity.HasKey(m => m.Id);
-            entity.Property(m => m.Id).IsRequired();
+            var entity = EntityMapperCore.AddMappings<Person, int>(
+                modelBuilder, true);
 
             entity.Property(m => m.FirstName).IsRequired(
                 ).HasMaxLength(Constraints.MAX_NAME_LENGTH);

@@ -6,13 +6,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DAL.Entities
+namespace Common.Entities
 {
-    public class Country
+    public class Country : EntityBase<int>
     {
-        [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.None)]
-        public int Id { get; set; }
         public string Name { get; set; }
         public string Code { get; set; }
 

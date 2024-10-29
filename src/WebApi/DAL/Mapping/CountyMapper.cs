@@ -1,4 +1,4 @@
-﻿using DAL.Entities;
+﻿using Common.Entities;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -13,8 +13,8 @@ namespace DAL.Mapping
         public static void AddMappings(
             ModelBuilder modelBuilder)
         {
-            var entity = modelBuilder.Entity<County>();
-            entity.HasKey(m => m.Id);
+            var entity = EntityMapperCore.AddMappings<County, int>(
+                modelBuilder, false);
 
             entity.Property(m => m.Id).ValueGeneratedNever(
                 ).IsRequired();

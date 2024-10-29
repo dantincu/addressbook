@@ -5,6 +5,8 @@ using DAL.Database;
 using Microsoft.EntityFrameworkCore;
 using DAL.Database.Migrations;
 
+var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
+
 var builder = WebApplication.CreateBuilder(args);
 
 DependencyRegistration.RegisterAllDependencies(
@@ -12,19 +14,24 @@ DependencyRegistration.RegisterAllDependencies(
     builder.Configuration,
     nameof(WebApi));
 
-// var conn = ConnectionStrings.CreateConnectionString();
-
-// Add services to the container.
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(name: MyAllowSpecificOrigins,
+        policy =>
+        {
+            policy.WithOrigins(
+                builder.Configuration.GetAllowedOrigins(
+                    )).AllowAnyHeader(
+                ).AllowAnyMethod(
+                ).AllowCredentials();
+        });
+});
 
 builder.Services.AddControllers();
 
 var app = builder.Build();
 
-// var workDir = Directory.GetCurrentDirectory();
-
 app.MigrateDatabase<AppDbContext>();
-
-// Configure the HTTP request pipeline.
 
 app.UseHttpsRedirection();
 

@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using Common.Database;
 using DAL.Database;
 using DAL.Helpers;
+using DAL.Repositories;
 
 namespace Dependencies.Registration
 {
@@ -20,7 +21,7 @@ namespace Dependencies.Registration
             IServiceCollection services,
             IConfiguration config)
         {
-
+            services.AddScoped<IRepositoryFactory, RepositoryFactory>();
         }
 
         public static void RegisterAllDependencies(

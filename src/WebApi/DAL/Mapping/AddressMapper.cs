@@ -1,4 +1,4 @@
-﻿using DAL.Entities;
+﻿using Common.Entities;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -13,7 +13,9 @@ namespace DAL.Mapping
         public static void AddMappings(
             ModelBuilder modelBuilder)
         {
-            var entity = modelBuilder.Entity<Address>();
+            var entity = EntityMapperCore.AddMappings<Address, int>(
+                modelBuilder, true);
+
             entity.HasKey(m => m.Id);
             entity.Property(m => m.Id).IsRequired();
             entity.Property(m => m.PersonId).IsRequired();

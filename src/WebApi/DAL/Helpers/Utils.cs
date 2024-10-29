@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Extensions.Configuration;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,6 +9,8 @@ namespace DAL.Helpers
 {
     public static class Utils
     {
+        public const string ALLOWED_ORIGINS_APP_SETTINGS_KEY = "AllowedOrigins";
+
         public static string ToUserFriendlyEnumeration<T>(
             this IEnumerable<T> nmrbl,
             string? firstItemPfxStr,
@@ -47,5 +50,11 @@ namespace DAL.Helpers
 
             return retStr;
         }
+
+        public static string[] GetAllowedOrigins(
+            this IConfiguration config) => config.GetValue<string[]>(
+                ALLOWED_ORIGINS_APP_SETTINGS_KEY) ?? throw new InvalidOperationException(
+                    string.Join(" ", "The appsettings file should contain an entry for key",
+                        $"{ALLOWED_ORIGINS_APP_SETTINGS_KEY} but the current one doesn't"));
     }
 }
