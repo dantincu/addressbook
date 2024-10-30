@@ -8,10 +8,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace UnitTests.Migrations
+namespace WebApi.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20241029173753_InitialCreate")]
+    [Migration("20241030130829_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -85,7 +85,6 @@ namespace UnitTests.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("StreetType")
-                        .IsRequired()
                         .HasMaxLength(200)
                         .HasColumnType("TEXT");
 

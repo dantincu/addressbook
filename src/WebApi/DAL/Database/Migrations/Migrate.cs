@@ -17,7 +17,7 @@ using System.Threading.Tasks;
 
 namespace DAL.Database.Migrations
 {
-    public static class MigrationManager
+    public static class Migrate
     {
         public static IHost MigrateDatabase<T>(
             this IHost host) where T : DbContext
@@ -40,25 +40,33 @@ namespace DAL.Database.Migrations
 
             if (!string.IsNullOrWhiteSpace(initialDataJsonFile))
             {
-                var initialData = JsonConvert.DeserializeObject<InitialData>(
-                    File.ReadAllText(initialDataJsonFile)) ?? throw new InvalidOperationException(
-                        $"File {initialDataJsonFile} does not contain valid json data");
-                
                 using (var scope = host.Services.CreateScope())
                 {
                     var repo = scope.ServiceProvider.GetRequiredService<IAddressRepository>();
 
-                    if (await repo.QueryHasAnyAsync(a => true))
+                    if (await repo.QueryHasAnyAsync(a => true) == false)
                     {
+                        var initialData = JsonConvert.DeserializeObject<InitialData>(
+                            File.ReadAllText(initialDataJsonFile)) ?? throw new InvalidOperationException(
+                                $"File {initialDataJsonFile} does not contain valid json data");
+
                         var countryRepo = scope.ServiceProvider.GetRequiredService<ICountryRepository>();
 
                         var allCountries = await countryRepo.GetQueryAsync(
                             countryRepo.QueryInclude(
                                 c => true, c => c.Counties));
 
+                        var someCountries = allCountries.Select(
+                            (country, idx) => (idx % 3 == 2) && !country.Counties.Any(
+                                ) ? null : country).ToArray();
+
                         for (int idx = 1; idx <= initialData.TotalNumberOfAddresses; idx++)
                         {
-                            var entity = CreateAddressEntity(allCountries, initialData, idx);
+                            var entity = CreateAddressEntity(
+                                allCountries,
+                                someCountries,
+                                initialData, idx);
+
                             repo.Add(entity);
                         }
 
@@ -70,6 +78,7 @@ namespace DAL.Database.Migrations
 
         private static Address CreateAddressEntity(
             Country[] allCountries,
+            Country?[] someCountries,
             InitialData initialData,
             int addressIdx)
         {
@@ -79,7 +88,7 @@ namespace DAL.Database.Migrations
             var address = new Address
             {
                 CountryName = generator.GetRandomValue(
-                    initialData.CountryNames),
+                    someCountries)?.Name,
                 CityName = generator.GetRandomValue(
                     initialData.CityNames),
                 StreetType = generator.GetRandomValue(
@@ -100,8 +109,15 @@ namespace DAL.Database.Migrations
                 ApartmentNumber = generator.GetRandomInt(
                     1, 1000).ToString(),
                 PostalCode = new string(Enumerable.Range(0, 6).Select(
-                    idx => generator.GetRandomChar('0', '9')).ToString()),
+                    idx => generator.GetRandomChar('0', '9')).ToArray()),
                 CreatedAtUtc = DateTime.UtcNow,
+                Person = new()
+                {
+                    FirstName = generator.GetRandomValue(
+                        initialData.Names),
+                    LastName = generator.GetRandomValue(
+                        initialData.SurNames)
+                }
             };
 
             if (address.CountryName == null)

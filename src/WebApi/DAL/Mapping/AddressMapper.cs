@@ -30,7 +30,7 @@ namespace DAL.Mapping
                 Constraints.MAX_NAME_LENGTH);
 
             entity.Property(m => m.StreetType).HasMaxLength(
-                Constraints.MAX_SHORT_NAME_LENGTH).IsRequired();
+                Constraints.MAX_SHORT_NAME_LENGTH);
 
             entity.Property(m => m.StreetName).HasMaxLength(
                 Constraints.MAX_NAME_LENGTH).IsRequired();

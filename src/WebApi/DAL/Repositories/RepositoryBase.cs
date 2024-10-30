@@ -114,9 +114,14 @@ namespace DAL.Repositories
                 EntityState.Modified);
 
         public void Delete(
-            TEntity entity) => AttachCore(
-                entity,
-                EntityState.Deleted);
+            TEntity entity)
+        {
+            var attached = AttachCore(
+                entity, out var dbSet);
+
+            dbSet ??= GetDbSet(DbContext);
+            dbSet.Remove(entity);
+        }
 
         public async Task<int> DeleteAsync(TPk id)
         {
@@ -345,14 +350,15 @@ namespace DAL.Repositories
             TEntity entity,
             EntityState entityState)
         {
-            var attached = AttachCore(entity);
+            var attached = AttachCore(entity, out _);
 
             attached.State = entityState;
             return attached;
         }
 
         private EntityEntry<TEntity> AttachCore(
-            TEntity entity)
+            TEntity entity,
+            out DbSet<TEntity>? dbSet)
         {
             var idRetriever = GetIdRetrieverLambdaExpr().Compile();
             var id = idRetriever(entity);
@@ -364,8 +370,12 @@ namespace DAL.Repositories
 
             if (entry == null)
             {
-                var dbSet = GetDbSet(DbContext);
+                dbSet = GetDbSet(DbContext);
                 entry = dbSet.Attach(entity);
+            }
+            else
+            {
+                dbSet = null;
             }
 
             return entry;

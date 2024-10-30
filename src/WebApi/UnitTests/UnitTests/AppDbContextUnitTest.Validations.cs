@@ -18,23 +18,12 @@ namespace UnitTests.UnitTests
         {
             await AssertThrowsBadRequest(async svc =>
                 {
-                    await svc.DeleteAsync(new ());
+                    await svc.DeleteAsync(0);
                 }, true);
-
-            await AssertThrowsBadRequest(async svc =>
-            {
-                await svc.DeleteAsync(new()
-                {
-                    PersonId = 1
-                });
-            });
 
             await AssertThrowsNotFound(async svc =>
             {
-                await svc.DeleteAsync(new()
-                {
-                    Id = 1
-                });
+                await svc.DeleteAsync(1);
             });
         }
 

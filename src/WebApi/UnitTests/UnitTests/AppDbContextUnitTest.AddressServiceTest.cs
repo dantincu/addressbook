@@ -46,8 +46,8 @@ namespace UnitTests.UnitTests
                 var person1 = address1.Person;
                 var person2 = address2.Person;
 
-                await addressService.DeleteAsync(address1);
-                await addressService.DeleteAsync(address2);
+                await addressService.DeleteAsync(address1.Id);
+                await addressService.DeleteAsync(address2.Id);
 
                 address1.Person ??= person1;
                 address2.Person ??= person2;

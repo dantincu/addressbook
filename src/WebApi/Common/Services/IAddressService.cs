@@ -9,11 +9,12 @@ namespace Common.Services
 {
     public interface IAddressService : IService
     {
+        Task<Address[]> GetAllAsync();
+
         Task<Address[]> GetFilteredAddressesAsync(
             AddressFilter filter);
 
-        Task<Address> GetAsync(
-            int id);
+        Task<Address> GetAsync(int id);
 
         Task<Address> CreateAsync(
             Address entity);
@@ -21,7 +22,6 @@ namespace Common.Services
         Task<Address> UpdateAsync(
             Address entity);
 
-        Task<Address> DeleteAsync(
-            Address entity);
+        Task<Address> DeleteAsync(int id);
     }
 }

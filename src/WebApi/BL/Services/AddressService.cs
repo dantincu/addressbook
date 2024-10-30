@@ -25,6 +25,14 @@ namespace BL.Services
         protected IPersonRepository PersonRepository { get; }
         protected IAddressRepository AddressRepository { get; }
 
+        public async Task<Address[]> GetAllAsync()
+        {
+            var addressesArr = await AddressRepository.GetQueryAsync(
+                addr => true);
+
+            return addressesArr;
+        }
+
         public async Task<Address[]> GetFilteredAddressesAsync(
             AddressFilter filter)
         {
@@ -68,23 +76,24 @@ namespace BL.Services
             return entity;
         }
 
-        public async Task<Address> DeleteAsync(
-            Address entity)
+        public async Task<Address> DeleteAsync(int id)
         {
+            var entity = new Address { Id = id };
+
             ValidateEntityCore<Address, int>(
                 entity, false);
 
-            entity.PersonId = await GetPersonIdAsync(entity.Id);
+            var personId = await GetPersonIdAsync(id);
 
             ThrowNotFoundIfTrue(
-                entity.PersonId == 0);
+                personId == 0);
 
             AddressRepository.Delete(entity!);
 
             PersonRepository.Delete(
                 new Person
                 {
-                    Id = entity.PersonId,
+                    Id = personId,
                 });
 
             await SaveChangesAsync();

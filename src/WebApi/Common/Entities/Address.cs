@@ -12,7 +12,7 @@ namespace Common.Entities
         public string? CountyName { get; set; }
         public string CityName { get; set; }
 
-        public string StreetType { get; set; }
+        public string? StreetType { get; set; }
         public string StreetName { get; set; }
         public string StreetNumber { get; set; }
         public string PostalCode { get; set; }

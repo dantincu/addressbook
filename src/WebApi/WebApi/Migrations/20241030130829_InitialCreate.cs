@@ -68,7 +68,7 @@ namespace WebApi.Migrations
                     CountryName = table.Column<string>(type: "TEXT", maxLength: 200, nullable: true),
                     CountyName = table.Column<string>(type: "TEXT", maxLength: 200, nullable: true),
                     CityName = table.Column<string>(type: "TEXT", maxLength: 200, nullable: false),
-                    StreetType = table.Column<string>(type: "TEXT", maxLength: 200, nullable: false),
+                    StreetType = table.Column<string>(type: "TEXT", maxLength: 200, nullable: true),
                     StreetName = table.Column<string>(type: "TEXT", maxLength: 200, nullable: false),
                     StreetNumber = table.Column<string>(type: "TEXT", maxLength: 200, nullable: false),
                     PostalCode = table.Column<string>(type: "TEXT", maxLength: 200, nullable: false),
