@@ -36,6 +36,8 @@ app.MigrateDatabase<AppDbContext>();
 await app.AddInitialDataIfReq(
     app.Configuration);
 
+app.UseCors(MyAllowSpecificOrigins);
+
 app.UseHttpsRedirection();
 
 app.UseAuthorization();

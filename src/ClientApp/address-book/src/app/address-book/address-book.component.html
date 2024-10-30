@@ -1,0 +1,23 @@
+<mat-toolbar
+  >Address Book
+  <button mat-icon-button class="edit-filters-btn">
+    <mat-icon>search</mat-icon>
+  </button>
+  <button mat-icon-button class="change-sorting-btn">
+    <mat-icon>sort</mat-icon>
+  </button>
+  <button mat-icon-button class="add-address-btn">
+    <mat-icon>add</mat-icon>
+  </button>
+  <button mat-icon-button class="refresh-addresses-btn">
+    <mat-icon>refresh</mat-icon>
+  </button>
+</mat-toolbar>
+<div class="container">
+  <app-loading-waiter
+    *ngIf="isLoading"
+    class="addresses-loading-waiter"
+  ></app-loading-waiter>
+  <div *ngIf="!isLoading && data" class="main-content">Success</div>
+  <div *ngIf="!isLoading && !data" class="error-content">{{ apiError }}</div>
+</div>

@@ -51,9 +51,22 @@ namespace DAL.Helpers
             return retStr;
         }
 
+        public static T GetCfgValue<T>(this IConfiguration config, string[] sectionNames)
+        {
+            var section = config.GetSection(sectionNames[0]);
+
+            for (int i = 1; i < sectionNames.Length; i++)
+            {
+                section = section.GetSection(sectionNames[i]);
+            }
+
+            var retVal = section.Get<T>();
+            return retVal;
+        }
+
         public static string[] GetAllowedOrigins(
-            this IConfiguration config) => config.GetValue<string[]>(
-                ALLOWED_ORIGINS_APP_SETTINGS_KEY) ?? throw new InvalidOperationException(
+            this IConfiguration config) => config.GetCfgValue<string[]>(
+                [ ALLOWED_ORIGINS_APP_SETTINGS_KEY ]) ?? throw new InvalidOperationException(
                     string.Join(" ", "The appsettings file should contain an entry for key",
                         $"{ALLOWED_ORIGINS_APP_SETTINGS_KEY} but the current one doesn't"));
     }
