@@ -18,9 +18,9 @@ using DAL.Helpers;
 
 namespace DAL.Database.Migrations
 {
-    public class InitialDataInsertComponent
+    public class StaticCataloguesInsertComponent
     {
-        public void InsertInitialData(
+        public void InsertData(
             MigrationBuilder migrationBuilder)
         {
             int cntrPk = 0;

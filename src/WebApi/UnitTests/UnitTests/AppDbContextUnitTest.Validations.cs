@@ -7,6 +7,7 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
+using UnitTests.Services;
 
 namespace UnitTests.UnitTests
 {
@@ -56,6 +57,18 @@ namespace UnitTests.UnitTests
             Func<ExtendedAddressService, Task> asyncAction,
             bool resetData = false)
         {
+            var exc = await Assert.ThrowsAsync<DataAccessException>(
+                () => PerformTestAsync(asyncAction, resetData));
+
+            Assert.Equal(
+                httpStatusCode,
+                exc.StatusCode);
+        }
+
+        private async Task PerformTestAsync(
+            Func<ExtendedAddressService, Task> asyncAction,
+            bool resetData = false)
+        {
             if (resetData)
             {
                 using (var svc = GetAddressService())
@@ -67,18 +80,10 @@ namespace UnitTests.UnitTests
                 }
             }
 
-            var exc = await Assert.ThrowsAsync<DataAccessException>(
-                async () =>
-                {
-                    using (var svc = GetAddressService())
-                    {
-                        await asyncAction(svc);
-                    }
-                });
-
-            Assert.Equal(
-                httpStatusCode,
-                exc.StatusCode);
+            using (var svc = GetAddressService())
+            {
+                await asyncAction(svc);
+            }
         }
 
         private ExtendedAddressService GetAddressService(

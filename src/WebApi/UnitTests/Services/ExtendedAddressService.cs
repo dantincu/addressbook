@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace UnitTests.UnitTests
+namespace UnitTests.Services
 {
     public class ExtendedAddressService : AddressService
     {

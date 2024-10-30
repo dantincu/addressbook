@@ -33,6 +33,9 @@ var app = builder.Build();
 
 app.MigrateDatabase<AppDbContext>();
 
+await app.AddInitialDataIfReq(
+    app.Configuration);
+
 app.UseHttpsRedirection();
 
 app.UseAuthorization();

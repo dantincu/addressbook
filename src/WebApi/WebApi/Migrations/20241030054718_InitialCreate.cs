@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace UnitTests.Migrations
+namespace WebApi.Migrations
 {
     /// <inheritdoc />
     public partial class InitialCreate : Migration

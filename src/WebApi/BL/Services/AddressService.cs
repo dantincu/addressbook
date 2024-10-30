@@ -36,7 +36,7 @@ namespace BL.Services
 
         public async Task<Address> GetAsync(int id)
         {
-            var entity = await AddressRepository.GetAsync(id);
+            var entity = await GetAsyncCore(id);
 
             ThrowNotFoundIfTrue(
                 entity == null);
@@ -48,9 +48,10 @@ namespace BL.Services
             Address entity)
         {
             ValidateAddress(entity, true);
+            entity.CreatedAtUtc = DateTime.UtcNow;
             AddressRepository.Add(entity);
-            await AppDbContext.SaveChangesAsync();
-
+            await SaveChangesAsync();
+            entity = (await GetAsyncCore(entity.Id))!;
             return entity;
         }
 
@@ -58,15 +59,12 @@ namespace BL.Services
             Address entity)
         {
             ValidateAddress(entity, false);
+            entity.PersonId = await GetPersonIdAsync(entity.Id);
+            ThrowNotFoundIfTrue(entity.PersonId == 0);
+            entity.LastModifiedAtUtc = DateTime.UtcNow;
             AddressRepository.Update(entity);
-            int result = await AppDbContext.SaveChangesAsync();
-
-            if (result <= 0)
-            {
-                throw new DataAccessException(
-                    HttpStatusCode.NotFound);
-            }
-
+            await SaveChangesAsync();
+            entity = (await GetAsyncCore(entity.Id))!;
             return entity;
         }
 
@@ -76,16 +74,10 @@ namespace BL.Services
             ValidateEntityCore<Address, int>(
                 entity, false);
 
-            ThrowBadRequestIfTrue(
-                entity.Person != null);
-
-            ThrowBadRequestIfTrue(
-                entity.PersonId != 0);
-
-            entity = (await AddressRepository.GetAsync(entity.Id))!;
+            entity.PersonId = await GetPersonIdAsync(entity.Id);
 
             ThrowNotFoundIfTrue(
-                entity == null);
+                entity.PersonId == 0);
 
             AddressRepository.Delete(entity!);
 
@@ -95,13 +87,22 @@ namespace BL.Services
                     Id = entity.PersonId,
                 });
 
-            int result = await AppDbContext.SaveChangesAsync();
-
-            ThrowNotFoundIfTrue(
-                result == 0);
-
+            await SaveChangesAsync();
             return entity;
         }
+
+        private Task<Address?> GetAsyncCore(
+            int addressId) => AddressRepository.GetAsync(
+                addressId, query => query.IncludeProp(
+                    a => a.Country, AddressRepository).IncludeProp(
+                    a => a.County, AddressRepository).IncludeProp(
+                    a => a.Person, AddressRepository));
+
+        private async Task<int> GetPersonIdAsync(
+            int addressId) => (await AddressRepository.GetQueryAsync(
+                AddressRepository.Query(
+                    a => a.Id == addressId,
+                    a => a.PersonId).Take(1))).SingleOrDefault();
 
         private void ValidateAddress(
             Address entity,
@@ -115,6 +116,9 @@ namespace BL.Services
                 entity.StreetName,
                 entity.StreetNumber ]);
 
+            entity.CountryId ??= entity.Country?.Id;
+            entity.CountyId ??= entity.County?.Id;
+
             ValidateAllRequiredStrings(
                 [ entity.CountryName ], entity.CountryId == null);
 
@@ -126,12 +130,14 @@ namespace BL.Services
 
             ValidatePerson(
                 entity.Person!,
-                isNew);
+                null);
+
+            ClearAddressNestedEntities(entity, isNew);
         }
 
         private void ValidatePerson(
             Person entity,
-            bool isNew)
+            bool? isNew)
         {
             ValidateEntityCore<Person, int>(
                 entity, isNew);
@@ -150,24 +156,16 @@ namespace BL.Services
                 string.IsNullOrWhiteSpace));
         }
 
-        private void ThrowBadRequestIfTrue(
-            bool condition) => ThrowIfTrue(
-                condition,
-                HttpStatusCode.BadRequest);
-
-        private void ThrowNotFoundIfTrue(
-            bool condition) => ThrowIfTrue(
-                condition,
-                HttpStatusCode.NotFound);
-
-        private void ThrowIfTrue(
-            bool condition,
-            HttpStatusCode httpStatusCode)
+        private void ClearAddressNestedEntities(
+            Address entity,
+            bool isNew)
         {
-            if (condition)
+            entity.Country = null;
+            entity.County = null;
+
+            if (!isNew)
             {
-                throw new DataAccessException(
-                    httpStatusCode);
+                entity.Person = null;
             }
         }
     }

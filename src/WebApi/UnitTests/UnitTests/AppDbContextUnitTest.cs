@@ -8,6 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Linq.Expressions;
 using UnitTests.Database;
+using UnitTests.Services;
 
 namespace UnitTests.UnitTests
 {
@@ -16,9 +17,7 @@ namespace UnitTests.UnitTests
         [Fact]
         public void CountCountriesTest()
         {
-            using (var ctx = new MyDbContextFactory(
-                ).CreateDbContext([nameof(
-                    DbConnectionType.UnitTestDev)]))
+            using (var ctx = GetDbContext())
             {
                 var countriesCount = ctx.Countries.Count();
                 Assert.Equal(197, countriesCount);
@@ -132,6 +131,67 @@ namespace UnitTests.UnitTests
         [Fact]
         public async Task AddressTest()
         {
+            BasicRepository<Address, int> basicRepo = null!;
+            Repository<Address, int> repo = null!;
+            Repository<Person, int> personRepo = null!;
+
+            await AddressTestCore(ctx =>
+            {
+                basicRepo = new(ctx);
+                repo = new(ctx);
+                personRepo = new(ctx);
+            }, async (ctx, address1, address2) =>
+            {
+                var actualAddress1 = await repo.Query(a => a.Id == address1.Id).IncludeProp(
+                    a => a.Person, repo).IncludeProp(
+                    a => a.Country, repo).IncludeProp(
+                    a => a.County, repo).FirstOrDefaultAsync();
+
+                var actualAddress2 = await basicRepo.Query(a => a.Id == address2.Id).IncludeProp(
+                    a => a.Person, repo).IncludeProp(
+                    a => a.Country, repo).IncludeProp(
+                    a => a.County, repo).FirstOrDefaultAsync();
+
+                AssertEntitiesAreEqual(address1, actualAddress1);
+                AssertEntitiesAreEqual(address2, actualAddress2);
+            }, async (ctx, address1, address2) =>
+            {
+                basicRepo.Add(address1);
+                repo.Add(address2);
+
+                var result = await ctx.SaveChangesAsync();
+            }, async (ctx, address1, address2) =>
+            {
+                basicRepo.Update(address1);
+                repo.Update(address2);
+
+                await ctx.SaveChangesAsync();
+            }, async (ctx, address1, address2) =>
+            {
+                repo.Delete(address1);
+                basicRepo.Delete(address2);
+
+                personRepo.Delete(address1.Person);
+                personRepo.Delete(address2.Person);
+
+                await ctx.SaveChangesAsync();
+            }, async (ctx, address1, address2) =>
+            {
+                await AssertHaveBeenDeleted(repo, address1);
+                await AssertHaveBeenDeleted(basicRepo, address2);
+                await AssertHaveBeenDeleted(personRepo, address1.Person);
+                await AssertHaveBeenDeleted(personRepo, address2.Person);
+            });
+        }
+
+        private async Task AddressTestCore(
+            Action<AppDbContext> assignServices,
+            Func<AppDbContext, Address, Address, Task> assertAction,
+            Func<AppDbContext, Address, Address, Task> addAction,
+            Func<AppDbContext, Address, Address, Task> updateAction,
+            Func<AppDbContext, Address, Address, Task> deleteAction,
+            Func<AppDbContext, Address, Address, Task> deletedAssertion)
+        {
             var address1 = new Address
             {
                 CountryName = "Romania",
@@ -145,7 +205,12 @@ namespace UnitTests.UnitTests
                 ApartmentNumber = "432",
                 PostalCode = "000999",
                 CreatedAtUtc = DateTime.UtcNow.AddMinutes(-1),
-                LastModifiedAtUtc = DateTime.UtcNow
+                LastModifiedAtUtc = DateTime.UtcNow,
+                Person = new Person
+                {
+                    FirstName = "John",
+                    LastName = "Doe",
+                }
             };
 
             var address2 = new Address
@@ -156,44 +221,12 @@ namespace UnitTests.UnitTests
                 StreetNumber = "65",
                 PostalCode = "999000",
                 CreatedAtUtc = DateTime.UtcNow.AddMinutes(-10),
-                LastModifiedAtUtc = DateTime.UtcNow.AddMinutes(-5)
-            };
-
-            var person1 = new Person
-            {
-                FirstName = "John",
-                LastName = "Doe",
-                Addresses = [address1]
-            };
-
-            var person2 = new Person
-            {
-                FirstName = "Patrick",
-                LastName = "Smith",
-                Addresses = [address2]
-            };
-
-            BasicRepository<Person, int> basicRepo = null!;
-            Repository<Person, int> repo = null!;
-            Repository<Address, int> addrRepo = null!;
-
-            Action<AppDbContext> assignRepos = (ctx) =>
-            {
-                basicRepo = new(ctx);
-                repo = new(ctx);
-                addrRepo = new(ctx);
-            };
-
-            Func<BasicRepository<Person, int>, Repository<Person, int>, Task> assertAction = async (
-                basicRepo, repo) =>
-            {
-                var allPersons = await repo.GetQueryAsync(e => true);
-
-                await GetAndAssertAreEqual(
-                    repo, person1, AssertEntitiesAreEqual);
-
-                await GetAndAssertAreEqual(
-                    basicRepo, person2, AssertEntitiesAreEqual);
+                LastModifiedAtUtc = DateTime.UtcNow.AddMinutes(-5),
+                Person = new Person
+                {
+                    FirstName = "Patrick",
+                    LastName = "Smith",
+                }
             };
 
             await PerformTestAsync(async ctx =>
@@ -207,29 +240,26 @@ namespace UnitTests.UnitTests
                 address2.Country = usCountry;
                 address2.County = usState;
 
-                assignRepos(ctx);
-                basicRepo.Add(person1);
-                repo.Add(person2);
+                assignServices(ctx);
+                await addAction(ctx, address1, address2);
 
-                var result = await ctx.SaveChangesAsync();
-
-                Assert.NotEqual(0, person1.Id);
-                Assert.NotEqual(0, person2.Id);
                 Assert.NotEqual(0, address1.Id);
                 Assert.NotEqual(0, address2.Id);
-                Assert.NotEqual(person1.Id, person2.Id);
+                Assert.NotEqual(0, address1.Person.Id);
+                Assert.NotEqual(0, address2.Person.Id);
+                Assert.NotEqual(address1.Person.Id, address2.Person.Id);
                 Assert.NotEqual(address1.Id, address2.Id);
             }, true);
 
             await PerformTestAsync(async ctx =>
             {
-                assignRepos(ctx);
-                await assertAction(basicRepo, repo);
+                assignServices(ctx);
+                await assertAction(ctx, address1, address2);
             });
 
             await PerformTestAsync(async ctx =>
             {
-                assignRepos(ctx);
+                assignServices(ctx);
 
                 address1.CountryName += " Country";
                 address1.CountyName += " County";
@@ -239,35 +269,31 @@ namespace UnitTests.UnitTests
                 address2.CountyName = address2.County.Name + " County";
                 address2.CityName += " City";
 
-                basicRepo.Update(person1);
-                repo.Update(person2);
-
-                await ctx.SaveChangesAsync();
+                await updateAction(ctx, address1, address2);
             });
 
             await PerformTestAsync(async ctx =>
             {
-                assignRepos(ctx);
-                await assertAction(basicRepo, repo);
+                assignServices(ctx);
+
+                await assertAction(
+                    ctx, address1, address2);
             });
 
             await PerformTestAsync(async ctx =>
             {
-                assignRepos(ctx);
+                assignServices(ctx);
 
-                repo.Delete(person1);
-                basicRepo.Delete(person2);
-
-                await ctx.SaveChangesAsync();
+                await deleteAction(
+                    ctx, address1, address2);
             });
 
             await PerformTestAsync(async ctx =>
             {
-                assignRepos(ctx);
-                await AssertHaveBeenDeleted(repo, person1);
-                await AssertHaveBeenDeleted(basicRepo, person2);
-                await AssertHaveBeenDeleted(addrRepo, address1);
-                await AssertHaveBeenDeleted(addrRepo, address2);
+                assignServices(ctx);
+
+                await deletedAssertion(
+                    ctx, address1, address2);
             });
         }
 
@@ -299,18 +325,14 @@ namespace UnitTests.UnitTests
         {
             if (resetData)
             {
-                using (var ctx = new MyDbContextFactory(
-                ).CreateDbContext([nameof(
-                    DbConnectionType.UnitTestDev)]))
+                using (var ctx = GetDbContext())
                 {
                     ResetDbContext(ctx);
                     await ctx.SaveChangesAsync();
                 }
             }
 
-            using (var ctx = new MyDbContextFactory(
-                ).CreateDbContext([nameof(
-                    DbConnectionType.UnitTestDev)]))
+            using (var ctx = GetDbContext())
             {
                 await testAction(ctx);
             }
@@ -332,8 +354,7 @@ namespace UnitTests.UnitTests
             AssertNestedObjectsAreEqual(
                 entity1.Country,
                 entity2.Country,
-                AssertEntitiesAreEqual,
-                false);
+                AssertEntitiesAreEqual);
 
             AssertNestedObjectsAreEqual(
                 entity1.County,
@@ -443,6 +464,9 @@ namespace UnitTests.UnitTests
                 areEqualCallback(obj1, obj2);
             }
         }
+
+        private AppDbContext GetDbContext(
+            ) => SvcProv.CreateScope().ServiceProvider.GetRequiredService<AppDbContext>();
 
         public class BasicRepository<TEntity, TPk> : RepositoryBase<TEntity, TPk>
             where TEntity : EntityBase<TPk>

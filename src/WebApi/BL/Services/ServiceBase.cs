@@ -31,14 +31,47 @@ namespace BL.Services
 
         protected void ValidateEntityCore<TEntity, TPk>(
             TEntity entity,
-            bool isNew)
+            bool? isNew)
             where TEntity : EntityBase<TPk>
             where TPk : IEquatable<TPk>
         {
-            if (entity.Id.Equals(default) != isNew)
+            if (isNew.HasValue && entity.Id.Equals(default) != isNew)
             {
                 throw new DataAccessException(
                     HttpStatusCode.BadRequest);
+            }
+        }
+
+        protected async Task<int> SaveChangesAsync(
+            HttpStatusCode? noChangesErrStatusCode = HttpStatusCode.NotFound)
+        {
+            int result = await this.AppDbContext.SaveChangesAsync();
+
+            ThrowIfTrue(
+                result <= 0 && noChangesErrStatusCode.HasValue,
+                noChangesErrStatusCode!.Value);
+
+            return result;
+        }
+
+        protected void ThrowBadRequestIfTrue(
+            bool condition) => ThrowIfTrue(
+                condition,
+                HttpStatusCode.BadRequest);
+
+        protected void ThrowNotFoundIfTrue(
+            bool condition) => ThrowIfTrue(
+                condition,
+                HttpStatusCode.NotFound);
+
+        protected void ThrowIfTrue(
+            bool condition,
+            HttpStatusCode httpStatusCode)
+        {
+            if (condition)
+            {
+                throw new DataAccessException(
+                    httpStatusCode);
             }
         }
     }

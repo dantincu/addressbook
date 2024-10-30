@@ -11,5 +11,17 @@ namespace Common.Services
     {
         Task<Address[]> GetFilteredAddressesAsync(
             AddressFilter filter);
+
+        Task<Address> GetAsync(
+            int id);
+
+        Task<Address> CreateAsync(
+            Address entity);
+
+        Task<Address> UpdateAsync(
+            Address entity);
+
+        Task<Address> DeleteAsync(
+            Address entity);
     }
 }

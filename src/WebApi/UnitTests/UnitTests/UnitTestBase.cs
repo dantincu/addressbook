@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnitTests.Database;
+using UnitTests.Dependencies;
 
 namespace UnitTests.UnitTests
 {

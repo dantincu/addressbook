@@ -9,8 +9,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnitTests.Database;
+using UnitTests.Services;
+using UnitTests.UnitTests;
 
-namespace UnitTests.UnitTests
+namespace UnitTests.Dependencies
 {
     public class DependencyRoot
     {
@@ -35,7 +37,6 @@ namespace UnitTests.UnitTests
             {
                 ctx.Database.Migrate();
             }
-
         }
 
         public static Lazy<DependencyRoot> Instance { get; } = new(() => new());
