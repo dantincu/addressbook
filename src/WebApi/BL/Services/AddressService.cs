@@ -31,6 +31,7 @@ namespace BL.Services
         {
             var addressesArr = await AddressRepository.GetQueryAsync(
                 addr => true,
+                query => query.Skip(filter.SkipCount).Take(filter.TakeCount),
                 addr => new AddressSummary
                 {
                     Id = addr.Id,

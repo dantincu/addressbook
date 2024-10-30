@@ -1,4 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  OnDestroy,
+  ElementRef,
+  AfterViewInit,
+  AfterViewChecked,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatSnackBar } from '@angular/material/snack-bar';
 
@@ -14,6 +21,7 @@ import {
   ExtendedAddress,
   AddressSummary,
   ExtendedAddressSummary,
+  AddressFilter,
 } from '../entities/entities';
 
 import { normalizeAddressSummaries } from '../entities/utility';
@@ -39,16 +47,51 @@ import { AddressSummaryComponent } from '../address-summary/address-summary.comp
   templateUrl: './address-book.component.html',
   styleUrl: './address-book.component.scss',
 })
-export class AddressBookComponent implements OnInit {
+export class AddressBookComponent
+  implements OnInit, AfterViewInit, AfterViewChecked, OnDestroy
+{
   readonly controllerName = 'addresses';
   data: ExtendedAddressSummary[] | null = null;
   isLoading: boolean = false;
+  isLoadingMore: boolean = false;
+  hasLoadedAll: boolean = false;
   apiError: any | null;
 
-  constructor(private apiService: ApiService, private snackBar: MatSnackBar) {}
+  rootElem!: HTMLElement;
+  mainElem!: HTMLElement;
+  containerElem!: HTMLElement;
+
+  constructor(
+    private apiService: ApiService,
+    private snackBar: MatSnackBar,
+    private elRef: ElementRef
+  ) {
+    this.rootElem = this.elRef.nativeElement;
+    this.onScroll = this.onScroll.bind(this);
+  }
 
   ngOnInit() {
     this.loadData();
+  }
+
+  ngAfterViewInit() {}
+
+  ngAfterViewChecked() {
+    this.containerElem = this.rootElem.querySelector(
+      '.container'
+    ) as HTMLElement;
+
+    this.mainElem = this.rootElem.querySelector('.main-content') as HTMLElement;
+
+    if (this.containerElem && this.mainElem) {
+      this.containerElem.addEventListener('scroll', this.onScroll);
+    }
+  }
+
+  ngOnDestroy() {
+    if (this.containerElem) {
+      this.containerElem.removeEventListener('scroll', this.onScroll);
+    }
   }
 
   refreshButtonClick(e: MouseEvent) {
@@ -56,12 +99,16 @@ export class AddressBookComponent implements OnInit {
   }
 
   private async loadData() {
+    this.hasLoadedAll = false;
     this.isLoading = true;
     this.data = null;
     this.apiError = null;
 
     this.apiService
-      .post<AddressSummary[]>(`${this.controllerName}/get-filtered`, {})
+      .post<AddressSummary[]>(`${this.controllerName}/get-filtered`, {
+        skipCount: 0,
+        takeCount: 20,
+      } as AddressFilter)
       .subscribe({
         next: (response: AddressSummary[]) => {
           this.data = normalizeAddressSummaries(response);
@@ -74,6 +121,47 @@ export class AddressBookComponent implements OnInit {
           this.showError(`${error.status}: ${error.statusText}`);
         },
       });
+  }
+
+  private async loadMore() {
+    if (!this.isLoadingMore && !this.hasLoadedAll) {
+      this.isLoadingMore = true;
+
+      this.apiService
+        .post<AddressSummary[]>(`${this.controllerName}/get-filtered`, {
+          skipCount: this.data?.length,
+          takeCount: 20,
+        } as AddressFilter)
+        .subscribe({
+          next: (response: AddressSummary[]) => {
+            (this.data ??= []).splice(
+              this.data.length - 1,
+              0,
+              ...normalizeAddressSummaries(response)
+            );
+            this.isLoadingMore = false;
+            this.hasLoadedAll = response.length === 0;
+          },
+          error: (error) => {
+            this.isLoadingMore = false;
+            this.showError(`${error.status}: ${error.statusText}`);
+          },
+        });
+    }
+  }
+
+  onScroll(e: Event) {
+    // this.loadData();
+    if (this.containerElem && this.mainElem) {
+      const diff =
+        this.mainElem.clientHeight -
+        this.containerElem.scrollTop -
+        window.innerHeight * 2;
+
+      if (diff < 0) {
+        this.loadMore();
+      }
+    }
   }
 
   async editClicked(address: AddressSummary) {}

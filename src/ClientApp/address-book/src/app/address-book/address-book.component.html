@@ -22,7 +22,11 @@
     *ngIf="isLoading"
     class="addresses-loading-waiter"
   ></app-loading-waiter>
-  <div *ngIf="!isLoading && data" class="main-content">
+  <div
+    *ngIf="!isLoading && data"
+    class="main-content"
+    (scroll)="onScroll($event)"
+  >
     <app-address-summary
       *ngFor="let address of data"
       [data]="address"
@@ -31,6 +35,10 @@
     >
     </app-address-summary>
   </div>
+  <app-loading-waiter
+    *ngIf="isLoadingMore"
+    class="addresses-loading-waiter"
+  ></app-loading-waiter>
   <div *ngIf="!isLoading && !data" class="error-content">
     <h6 class="error-caption">{{ apiError.status }}</h6>
     <span class="error-message">{{ apiError.statusText }}</span>

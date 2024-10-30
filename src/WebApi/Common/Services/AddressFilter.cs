@@ -8,5 +8,7 @@ namespace Common.Services
 {
     public class AddressFilter
     {
+        public int SkipCount { get; set; }
+        public int TakeCount { get; set; }
     }
 }

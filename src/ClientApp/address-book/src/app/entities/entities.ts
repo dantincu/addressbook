@@ -66,3 +66,8 @@ export interface ExtendedAddress extends Address, ExtendedTimeStampEntity {}
 export interface ExtendedAddressSummary
   extends AddressSummary,
     ExtendedTimeStampEntity {}
+
+export interface AddressFilter {
+  skipCount: number;
+  takeCount: number;
+}

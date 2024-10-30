@@ -42,7 +42,7 @@
 
 .container {
   margin-top: 0px;
-  height: calc(100% - 56px);
+  height: calc(100% - var(--mat-toolbar-standard-height));
   width: 100%;
   overflow: scroll;
   display: flex;
@@ -51,6 +51,12 @@
 
   > .addresses-loading-waiter {
     margin-top: 20px;
+  }
+}
+
+@media (max-width: 599px) {
+  .container {
+    height: calc(100% - var(--mat-toolbar-mobile-height));
   }
 }
 
