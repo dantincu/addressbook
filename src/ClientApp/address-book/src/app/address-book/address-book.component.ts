@@ -5,16 +5,24 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 
-import { Address, Country, County, Person } from '../entities/entities';
+import {
+  Address,
+  Country,
+  County,
+  Person,
+  ExtendedAddress,
+  AddressSummary,
+  ExtendedAddressSummary,
+} from '../entities/entities';
+
+import { normalizeAddressSummaries } from '../entities/utility';
+
 import { dateToDisplayStr, moveUtcDateToLocalTime } from '../services/date';
 import { LoadingWaiterComponent } from '../loading-waiter/loading-waiter.component';
 
 import { ApiService } from '../services/api-service/api-service.service';
 
-interface ExtendedAddress extends Address {
-  createdAt: Date | string;
-  lastModifiedAt?: Date | string | null | undefined;
-}
+import { AddressSummaryComponent } from '../address-summary/address-summary.component';
 
 @Component({
   selector: 'app-address-book',
@@ -25,21 +33,24 @@ interface ExtendedAddress extends Address {
     MatButtonModule,
     MatIconModule,
     LoadingWaiterComponent,
+    AddressSummaryComponent,
   ],
   templateUrl: './address-book.component.html',
   styleUrl: './address-book.component.scss',
 })
 export class AddressBookComponent implements OnInit {
   readonly controllerName = 'addresses';
-  data: ExtendedAddress[] | null = null;
+  data: ExtendedAddressSummary[] | null = null;
   isLoading: boolean = false;
   apiError: any | null;
 
-  constructor(private apiService: ApiService) {
-    this.transformData = this.transformData.bind(this);
-  }
+  constructor(private apiService: ApiService) {}
 
   ngOnInit() {
+    this.loadData();
+  }
+
+  refreshButtonClick(e: MouseEvent) {
     this.loadData();
   }
 
@@ -48,37 +59,17 @@ export class AddressBookComponent implements OnInit {
     this.data = null;
     this.apiError = null;
 
-    this.apiService.get<Address[]>(this.controllerName).subscribe({
-      next: (response: Address[]) => {
-        this.data = this.transformData(response);
-        this.isLoading = false;
-      },
-      error: (error) => {
-        this.apiError = JSON.stringify(error, null, '  ');
-        this.isLoading = false;
-      },
-    });
-  }
-
-  private transformUtcDate(dateStr: string) {
-    const dateNum = Date.parse(dateStr);
-    const date = moveUtcDateToLocalTime(new Date(dateNum));
-    const displayStr = dateToDisplayStr(date);
-    return displayStr;
-  }
-
-  private transformData(inputData: Address[]) {
-    const outputData = inputData.map(
-      (data) =>
-        ({
-          ...data,
-          createdAt: this.transformUtcDate(data.createdAtUtc),
-          lastModifiedAt: data.lastModifiedAtUtc
-            ? this.transformUtcDate(data.lastModifiedAtUtc)
-            : null,
-        } as ExtendedAddress)
-    );
-
-    return outputData;
+    this.apiService
+      .post<AddressSummary[]>(`${this.controllerName}/get-filtered`, {})
+      .subscribe({
+        next: (response: AddressSummary[]) => {
+          this.data = normalizeAddressSummaries(response);
+          this.isLoading = false;
+        },
+        error: (error) => {
+          this.apiError = JSON.stringify(error, null, '  ');
+          this.isLoading = false;
+        },
+      });
   }
 }

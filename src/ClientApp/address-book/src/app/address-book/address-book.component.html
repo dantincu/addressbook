@@ -9,7 +9,11 @@
   <button mat-icon-button class="add-address-btn">
     <mat-icon>add</mat-icon>
   </button>
-  <button mat-icon-button class="refresh-addresses-btn">
+  <button
+    mat-icon-button
+    class="refresh-addresses-btn"
+    (click)="refreshButtonClick($event)"
+  >
     <mat-icon>refresh</mat-icon>
   </button>
 </mat-toolbar>
@@ -18,6 +22,9 @@
     *ngIf="isLoading"
     class="addresses-loading-waiter"
   ></app-loading-waiter>
-  <div *ngIf="!isLoading && data" class="main-content">Success</div>
+  <div *ngIf="!isLoading && data" class="main-content">
+    <app-address-summary *ngFor="let address of data" [data]="address">
+    </app-address-summary>
+  </div>
   <div *ngIf="!isLoading && !data" class="error-content">{{ apiError }}</div>
 </div>

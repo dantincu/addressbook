@@ -20,10 +20,6 @@ namespace WebApi.Controllers
                 nameof(addressService));
         }
 
-        [HttpGet]
-        public Task<IActionResult> Get() => ExecuteAsync(
-            addressService.GetAllAsync);
-
         [HttpGet("{id}")]
         public Task<IActionResult> Get(
             int id) => ExecuteAsync((
@@ -43,7 +39,7 @@ namespace WebApi.Controllers
         /// </summary>
         /// <param name="filter">The filter propery values.</param>
         /// <returns>A collection containing the address entities that satisfy the filter conditions.</returns>
-        [HttpGet]
+        [HttpPost]
         [Route("get-filtered")]
         public Task<IActionResult> Post(
             [FromBody] AddressFilter filter) => ExecuteAsync(

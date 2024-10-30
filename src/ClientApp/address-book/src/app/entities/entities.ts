@@ -2,6 +2,17 @@ export interface EntityBase<TPk> {
   id: TPk;
 }
 
+export interface TimeStampEntity {
+  createdAtUtc: string;
+  lastModifiedAtUtc?: string | null | undefined;
+}
+
+export interface ExtendedTimeStampEntity extends TimeStampEntity {
+  createdAt: string;
+  lastModifiedAt?: string | null | undefined;
+  lastModifiedOrCreatedStr: string;
+}
+
 export interface Country extends EntityBase<number> {
   name: string;
   code: string;
@@ -19,7 +30,7 @@ export interface Person extends EntityBase<number> {
   lastName: string;
 }
 
-export interface Address extends EntityBase<number> {
+export interface Address extends EntityBase<number>, TimeStampEntity {
   countryName?: string | null | undefined;
   countyName?: string | null | undefined;
   cityName: string;
@@ -37,6 +48,20 @@ export interface Address extends EntityBase<number> {
   country?: Country | null | undefined;
   county?: County | null | undefined;
   person: Person;
-  createdAtUtc: string;
-  lastModifiedAtUtc?: string | null | undefined;
 }
+
+export interface AddressSummary extends EntityBase<number>, TimeStampEntity {
+  firstName?: string;
+  middleName?: string;
+  lastName?: string;
+  fullName: string;
+  countryName: string;
+  countyName: string;
+  cityName: string;
+}
+
+export interface ExtendedAddress extends Address, ExtendedTimeStampEntity {}
+
+export interface ExtendedAddressSummary
+  extends AddressSummary,
+    ExtendedTimeStampEntity {}

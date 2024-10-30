@@ -1,4 +1,5 @@
-﻿using Common.Entities;
+﻿using Common.DTOs;
+using Common.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,9 +10,7 @@ namespace Common.Services
 {
     public interface IAddressService : IService
     {
-        Task<Address[]> GetAllAsync();
-
-        Task<Address[]> GetFilteredAddressesAsync(
+        Task<AddressSummary[]> GetFilteredAddressesAsync(
             AddressFilter filter);
 
         Task<Address> GetAsync(int id);

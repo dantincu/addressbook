@@ -1,4 +1,5 @@
 ﻿using Common.Database;
+using Common.DTOs;
 using Common.Entities;
 using Common.Services;
 using System;
@@ -25,19 +26,39 @@ namespace BL.Services
         protected IPersonRepository PersonRepository { get; }
         protected IAddressRepository AddressRepository { get; }
 
-        public async Task<Address[]> GetAllAsync()
-        {
-            var addressesArr = await AddressRepository.GetQueryAsync(
-                addr => true);
-
-            return addressesArr;
-        }
-
-        public async Task<Address[]> GetFilteredAddressesAsync(
+        public async Task<AddressSummary[]> GetFilteredAddressesAsync(
             AddressFilter filter)
         {
             var addressesArr = await AddressRepository.GetQueryAsync(
-                addr => true);
+                addr => true,
+                addr => new AddressSummary
+                {
+                    Id = addr.Id,
+                    FirstName = addr.Person.FirstName,
+                    MiddleName = addr.Person.MiddleName,
+                    LastName = addr.Person.LastName,
+                    CountryName = addr.CountryName ?? addr.Country.Name,
+                    CountyName = addr.CountyName ?? addr.County.Name,
+                    CityName = addr.CityName,
+                    CreatedAtUtc = addr.CreatedAtUtc,
+                    LastModifiedAtUtc = addr.LastModifiedAtUtc
+                });
+
+            foreach (var address in addressesArr)
+            {
+                address.FullName = string.Join(
+                    " ", new string?[]
+                    {
+                        address.FirstName,
+                        address.MiddleName,
+                        address.LastName
+                    }.Select(name => name?.Trim()).Where(
+                        name => !string.IsNullOrEmpty(name)));
+
+                address.FirstName = null;
+                address.MiddleName = null;
+                address.LastName = null;
+            }
 
             return addressesArr;
         }
