@@ -23,6 +23,23 @@
   }
 }
 
+.error-content {
+    margin: 1em;
+}
+
+.error-caption {
+  font-family: 'Roboto', sans-serif;
+  font-size: 24px;
+  margin: 1em;
+  margin-top: 0.5em;
+  color: #F40;
+}
+
+.error-message {
+  font-family: 'Roboto', sans-serif;
+  margin: 1em;
+}
+
 .container {
   margin-top: 0px;
   height: calc(100% - 56px);

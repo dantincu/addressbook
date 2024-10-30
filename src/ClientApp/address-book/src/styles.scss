@@ -4,3 +4,14 @@ html, body {
     height: 100%;
     margin: 0;
 }
+
+.error-snackbar {
+  .mat-mdc-simple-snack-bar{
+    background-color: #F64; /* Red background */
+    color: #fff; /* White text */
+
+    .mat-mdc-snack-bar-actions .mat-mdc-snack-bar-action:not(:disabled) {
+      color: #fff; /* White text */
+    }
+  }
+}

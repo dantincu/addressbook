@@ -58,6 +58,7 @@ export interface AddressSummary extends EntityBase<number>, TimeStampEntity {
   countryName: string;
   countyName: string;
   cityName: string;
+  hasPendingApiCall?: boolean | null | undefined;
 }
 
 export interface ExtendedAddress extends Address, ExtendedTimeStampEntity {}

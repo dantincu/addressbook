@@ -1,4 +1,14 @@
-<mat-card>
+<mat-card class="{{ data.hasPendingApiCall ? 'has-pending-api-call' : '' }}">
+  <button mat-icon-button class="edit-btn" [disabled]="data.hasPendingApiCall">
+    <mat-icon>edit</mat-icon>
+  </button>
+  <button
+    mat-icon-button
+    class="delete-btn"
+    [disabled]="data.hasPendingApiCall"
+  >
+    <mat-icon>delete</mat-icon>
+  </button>
   <mat-card-header>
     <mat-card-title>{{ data.fullName }}</mat-card-title>
     <mat-card-subtitle>{{ data.lastModifiedOrCreatedStr }}</mat-card-subtitle>

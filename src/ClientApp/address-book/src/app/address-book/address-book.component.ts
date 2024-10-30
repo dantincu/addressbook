@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatButtonModule } from '@angular/material/button';
@@ -44,7 +45,7 @@ export class AddressBookComponent implements OnInit {
   isLoading: boolean = false;
   apiError: any | null;
 
-  constructor(private apiService: ApiService) {}
+  constructor(private apiService: ApiService, private snackBar: MatSnackBar) {}
 
   ngOnInit() {
     this.loadData();
@@ -67,9 +68,39 @@ export class AddressBookComponent implements OnInit {
           this.isLoading = false;
         },
         error: (error) => {
-          this.apiError = JSON.stringify(error, null, '  ');
+          this.apiError = error;
           this.isLoading = false;
+
+          this.showError(`${error.status}: ${error.statusText}`);
         },
       });
+  }
+
+  async editClicked(address: AddressSummary) {}
+
+  async deleteClicked(address: AddressSummary) {
+    address.hasPendingApiCall = true;
+    this.apiService.delete(`${this.controllerName}/${address.id}`).subscribe({
+      next: () => {
+        const idx = this.data!.findIndex((addr) => addr.id === address.id);
+
+        if (idx >= 0) {
+          this.data!.splice(idx, 1);
+        }
+
+        address.hasPendingApiCall = false;
+      },
+      error: (error) => {
+        this.showError(`${error.status}: ${error.statusText}`);
+        address.hasPendingApiCall = false;
+      },
+    });
+  }
+
+  showError(message: string) {
+    this.snackBar.open(message, 'Close', {
+      duration: 10000, // Duration in milliseconds
+      panelClass: ['error-snackbar'], // Optional custom class for styling
+    });
   }
 }

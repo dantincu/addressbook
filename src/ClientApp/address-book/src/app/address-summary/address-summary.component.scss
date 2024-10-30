@@ -1,29 +1,47 @@
 mat-card {
-    background-color: #EEE !important;
-    margin: 10px;
-    cursor: pointer;
+  background-color: #FFFCF0 !important;
+  margin: 10px;
+  cursor: pointer;
 
-    mat-card-subtitle {
-      color: #888;
+  &.has-pending-api-call {
+    background-color: #FFFFFF !important;
+  }
+
+  mat-card-subtitle {
+    color: #444;
+    font-weight: normal;
+    font-style: italic;
+    font-size: 14px;
+  }
+
+  mat-card-content {
+    font-family: 'Roboto', sans-serif;
+
+    .city-name {
+      font-weight: 300;
     }
 
-    mat-card-content {
-      font-family: 'Roboto', sans-serif;
-
-      .city-name {
-        font-style: italic;
-      }
-
-      .county-name {
-        font-style: italic;
-        font-weight: 500;
-      }
-
-      .country-name {
-        font-style: italic;
-        font-weight: 500;
-        font-size: 20px;
-      }
+    .county-name {
+      font-weight: 500;
     }
+
+    .country-name {
+      font-weight: 500;
+      font-size: 20px;
+    }
+  }
+
+  .edit-btn {
+    position: absolute;
+    right: 0px;
+    color: #000;
+  }
+
+  .delete-btn {
+    position: absolute;
+    right: 0px;
+    bottom: 0px;
+    color: #F20;
+  }
 }
 

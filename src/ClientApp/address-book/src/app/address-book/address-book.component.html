@@ -23,8 +23,16 @@
     class="addresses-loading-waiter"
   ></app-loading-waiter>
   <div *ngIf="!isLoading && data" class="main-content">
-    <app-address-summary *ngFor="let address of data" [data]="address">
+    <app-address-summary
+      *ngFor="let address of data"
+      [data]="address"
+      (deleteClicked)="deleteClicked($event)"
+      (editClicked)="editClicked($event)"
+    >
     </app-address-summary>
   </div>
-  <div *ngIf="!isLoading && !data" class="error-content">{{ apiError }}</div>
+  <div *ngIf="!isLoading && !data" class="error-content">
+    <h6 class="error-caption">{{ apiError.status }}</h6>
+    <span class="error-message">{{ apiError.statusText }}</span>
+  </div>
 </div>
