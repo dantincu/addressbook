@@ -4,6 +4,7 @@ using Common.Database;
 using DAL.Database;
 using Microsoft.EntityFrameworkCore;
 using DAL.Database.Migrations;
+using System.Text.Json.Serialization;
 
 var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 
@@ -27,7 +28,10 @@ builder.Services.AddCors(options =>
         });
 });
 
-builder.Services.AddControllers();
+builder.Services.AddControllers().AddJsonOptions(options =>
+{
+    options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault;
+});
 
 var app = builder.Build();
 

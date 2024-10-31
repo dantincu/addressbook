@@ -6,7 +6,11 @@
   <button mat-icon-button class="change-sorting-btn">
     <mat-icon>sort</mat-icon>
   </button>
-  <button mat-icon-button class="add-address-btn">
+  <button
+    mat-icon-button
+    class="add-address-btn"
+    (click)="createClicked($event)"
+  >
     <mat-icon>add</mat-icon>
   </button>
   <button
@@ -23,7 +27,7 @@
     class="addresses-loading-waiter"
   ></app-loading-waiter>
   <div
-    *ngIf="!isLoading && data"
+    *ngIf="!isLoading && data?.length"
     class="main-content"
     (scroll)="onScroll($event)"
   >
@@ -34,6 +38,9 @@
       (editClicked)="editClicked($event)"
     >
     </app-address-summary>
+  </div>
+  <div *ngIf="!isLoading && data?.length === 0">
+    <p class="no-data-message">No address has been created yet.</p>
   </div>
   <app-loading-waiter
     *ngIf="isLoadingMore"

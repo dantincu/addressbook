@@ -38,13 +38,15 @@ namespace DAL.Database.Migrations
             string? initialDataJsonFile = config.GetValue<string?>(
                 "InitialDataJsonFile");
 
-            if (!string.IsNullOrWhiteSpace(initialDataJsonFile))
+            if (!string.IsNullOrWhiteSpace(
+                initialDataJsonFile))
             {
                 using (var scope = host.Services.CreateScope())
                 {
                     var repo = scope.ServiceProvider.GetRequiredService<IAddressRepository>();
 
-                    if (await repo.QueryHasAnyAsync(a => true) == false)
+                    if (await repo.QueryHasAnyAsync(a => true) == false && File.Exists(
+                        initialDataJsonFile))
                     {
                         var initialData = JsonConvert.DeserializeObject<InitialData>(
                             File.ReadAllText(initialDataJsonFile)) ?? throw new InvalidOperationException(

@@ -6,12 +6,14 @@ import {
   AfterViewInit,
   AfterViewChecked,
 } from '@angular/core';
+
 import { CommonModule } from '@angular/common';
 import { MatSnackBar } from '@angular/material/snack-bar';
 
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+import { MatDialog } from '@angular/material/dialog';
 
 import {
   Address,
@@ -32,6 +34,7 @@ import { LoadingWaiterComponent } from '../loading-waiter/loading-waiter.compone
 import { ApiService } from '../services/api-service/api-service.service';
 
 import { AddressSummaryComponent } from '../address-summary/address-summary.component';
+import { AddressDetailsComponent } from '../address-details/address-details.component';
 
 @Component({
   selector: 'app-address-book',
@@ -64,7 +67,8 @@ export class AddressBookComponent
   constructor(
     private apiService: ApiService,
     private snackBar: MatSnackBar,
-    private elRef: ElementRef
+    private elRef: ElementRef,
+    private editAddressDialog: MatDialog
   ) {
     this.rootElem = this.elRef.nativeElement;
     this.onScroll = this.onScroll.bind(this);
@@ -96,6 +100,62 @@ export class AddressBookComponent
 
   refreshButtonClick(e: MouseEvent) {
     this.loadData();
+  }
+
+  onScroll(e: Event) {
+    // this.loadData();
+    if (this.containerElem && this.mainElem) {
+      const diff =
+        this.mainElem.clientHeight -
+        this.containerElem.scrollTop -
+        window.innerHeight * 2;
+
+      if (diff < 0) {
+        this.loadMore();
+      }
+    }
+  }
+
+  async editClicked(address: AddressSummary) {
+    this.openEditAddressDialog(address);
+  }
+
+  async deleteClicked(address: AddressSummary) {
+    address.hasPendingApiCall = true;
+    this.apiService.delete(`${this.controllerName}/${address.id}`).subscribe({
+      next: () => {
+        const idx = this.data!.findIndex((addr) => addr.id === address.id);
+
+        if (idx >= 0) {
+          this.data!.splice(idx, 1);
+        }
+
+        address.hasPendingApiCall = false;
+      },
+      error: (error) => {
+        this.showError(`${error.status}: ${error.statusText}`);
+        address.hasPendingApiCall = false;
+      },
+    });
+  }
+
+  createClicked(e: MouseEvent) {
+    this.openEditAddressDialog({} as AddressSummary);
+  }
+
+  openEditAddressDialog(address: AddressSummary) {
+    this.editAddressDialog.open(AddressDetailsComponent, {
+      data: address,
+      width: 'calc(max(100vw - 10px, 1000px))',
+      height: 'calc(100vh - 10px)',
+    });
+  }
+
+  showError(message: string) {
+    this.snackBar.open(message, 'Close', {
+      duration: 10000, // Duration in milliseconds
+      panelClass: ['error-snackbar'], // Optional custom class for styling
+    });
   }
 
   private async loadData() {
@@ -148,47 +208,5 @@ export class AddressBookComponent
           },
         });
     }
-  }
-
-  onScroll(e: Event) {
-    // this.loadData();
-    if (this.containerElem && this.mainElem) {
-      const diff =
-        this.mainElem.clientHeight -
-        this.containerElem.scrollTop -
-        window.innerHeight * 2;
-
-      if (diff < 0) {
-        this.loadMore();
-      }
-    }
-  }
-
-  async editClicked(address: AddressSummary) {}
-
-  async deleteClicked(address: AddressSummary) {
-    address.hasPendingApiCall = true;
-    this.apiService.delete(`${this.controllerName}/${address.id}`).subscribe({
-      next: () => {
-        const idx = this.data!.findIndex((addr) => addr.id === address.id);
-
-        if (idx >= 0) {
-          this.data!.splice(idx, 1);
-        }
-
-        address.hasPendingApiCall = false;
-      },
-      error: (error) => {
-        this.showError(`${error.status}: ${error.statusText}`);
-        address.hasPendingApiCall = false;
-      },
-    });
-  }
-
-  showError(message: string) {
-    this.snackBar.open(message, 'Close', {
-      duration: 10000, // Duration in milliseconds
-      panelClass: ['error-snackbar'], // Optional custom class for styling
-    });
   }
 }

@@ -1,1 +1,46 @@
-<p>address-details works!</p>
+<div class="modal-dialog">
+  <h2 mat-dialog-title>{{ (isEdit ? "Edit" : "Add") + " Address" }}</h2>
+  <div mat-dialog-content>
+    <form [formGroup]="form" (ngSubmit)="onSave()" class="app-form">
+      <mat-form-field appearance="fill" class="app-form-field grid-row-1">
+        <mat-label>First Name</mat-label>
+        <input matInput required formControlName="firstName" />
+      </mat-form-field>
+      <mat-form-field appearance="fill" class="app-form-field grid-row-2">
+        <mat-label>Middle Name</mat-label>
+        <input matInput formControlName="middleName" />
+      </mat-form-field>
+      <mat-form-field appearance="fill" class="app-form-field grid-row-3">
+        <mat-label>Last Name</mat-label>
+        <input matInput required formControlName="lastName" />
+      </mat-form-field>
+    </form>
+  </div>
+  <div mat-dialog-actions class="dialog-actions">
+    <button
+      mat-raised-button
+      color="primary"
+      class="save-btn"
+      (click)="onSave()"
+    >
+      Save
+    </button>
+    <button
+      mat-icon-button
+      color="primary"
+      class="close-btn outlined-icon-button"
+      (click)="onClose()"
+    >
+      <mat-icon>close</mat-icon>
+    </button>
+    <button
+      *ngIf="isEdit"
+      mat-icon-button
+      color="accent"
+      class="delete-btn outlined-icon-button"
+      (click)="onDelete()"
+    >
+      <mat-icon>delete</mat-icon>
+    </button>
+  </div>
+</div>

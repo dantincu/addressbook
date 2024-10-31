@@ -15,7 +15,7 @@ namespace Common.Entities
         public string? StreetType { get; set; }
         public string StreetName { get; set; }
         public string StreetNumber { get; set; }
-        public string PostalCode { get; set; }
+        public string? PostalCode { get; set; }
 
         public string? BlockNumber { get; set; }
         public string? StairNumber { get; set; }

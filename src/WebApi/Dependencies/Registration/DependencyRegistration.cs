@@ -22,6 +22,7 @@ namespace Dependencies.Registration
         public static void RegisterAllDependencies(
             IServiceCollection services)
         {
+            services.AddScoped<ICataloguesService, CataloguesService>();
             services.AddScoped<IAddressService, AddressService>();
             services.AddScoped<IRepositoryFactory, RepositoryFactory>();
             services.AddScoped<IPersonRepository, PersonRepository>();
