@@ -1,0 +1,26 @@
+:host {
+  display: grid;
+}
+
+div.mat-mdc-select-panel {
+  background-color: #FFF;
+  color: #000;
+}
+
+mat-option.mat-mdc-option.mdc-list-item  {
+  background-color: #FFF;
+  color: #000;
+
+  mat-mdc-select-panel {
+    background-color: #FFF;
+    color: #000;
+  }
+}
+
+.grid-row-1 {
+  grid-row: 1;
+}
+
+.grid-row-2 {
+  grid-row: 2;
+}

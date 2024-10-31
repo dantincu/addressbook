@@ -14,6 +14,26 @@
         <mat-label>Last Name</mat-label>
         <input matInput required formControlName="lastName" />
       </mat-form-field>
+      <app-free-text-or-lookup
+        class="grid-row-4"
+        caption="Country"
+        lookupApiUrl="{{ 'countries' }}"
+        [lookupIsActive]="true"
+        [isRequired]="true"
+        labelMemberName="name"
+        idMemberName="code"
+        (currentChanged)="countryChanged($event)"
+      ></app-free-text-or-lookup>
+      <app-free-text-or-lookup
+        class="grid-row-5"
+        caption="County / State"
+        lookupApiUrl="{{ 'counties/' + country.id }}"
+        [lookupIsActive]="countyLookupIsEnabled"
+        [isRequired]="true"
+        labelMemberName="name"
+        idMemberName="id"
+        (currentChanged)="countyChanged($event)"
+      ></app-free-text-or-lookup>
     </form>
   </div>
   <div mat-dialog-actions class="dialog-actions">

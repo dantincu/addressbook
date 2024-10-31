@@ -28,7 +28,6 @@ import {
 
 import { normalizeAddressSummaries } from '../entities/utility';
 
-import { dateToDisplayStr, moveUtcDateToLocalTime } from '../services/date';
 import { LoadingWaiterComponent } from '../loading-waiter/loading-waiter.component';
 
 import { ApiService } from '../services/api-service/api-service.service';

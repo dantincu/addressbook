@@ -1,1 +1,21 @@
-<p>free-text-or-lookup works!</p>
+<mat-form-field appearance="fill" class="app-form-field grid-row-1">
+  <mat-label>{{ caption }}</mat-label>
+  <mat-select
+    [(ngModel)]="currentId"
+    [required]="isRequiredVal && !userTextInput"
+    (selectionChange)="currentItemChanged($event)"
+  >
+    <mat-option *ngFor="let item of data" [value]="item.id">
+      {{ item.name }}
+    </mat-option>
+  </mat-select>
+</mat-form-field>
+<mat-form-field appearance="fill" class="app-form-field grid-row-2">
+  <input
+    matInput
+    [required]="isRequiredVal"
+    [(ngModel)]="userTextInput"
+    [placeholder]="placeholderVal"
+    (input)="userTextInputChanged($event)"
+  />
+</mat-form-field>

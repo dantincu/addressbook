@@ -12,6 +12,13 @@ import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 
 import { ExtendedAddressSummary } from '../entities/entities';
 
+import { ApiService } from '../services/api-service/api-service.service';
+
+import {
+  FreeTextOrLookupComponent,
+  CatalogueItem,
+} from '../free-text-or-lookup/free-text-or-lookup.component';
+
 @Component({
   selector: 'app-address-details',
   standalone: true,
@@ -24,6 +31,7 @@ import { ExtendedAddressSummary } from '../entities/entities';
     MatInputModule,
     ReactiveFormsModule,
     FormsModule,
+    FreeTextOrLookupComponent,
   ],
   templateUrl: './address-details.component.html',
   styleUrl: './address-details.component.scss',
@@ -34,8 +42,6 @@ export class AddressDetailsComponent {
     firstName: new FormControl(''),
     middleName: new FormControl<string | null>(null),
     lastName: new FormControl(''),
-    countryName: new FormControl<string | null>(null),
-    countyName: new FormControl<string | null>(null),
     cityName: new FormControl(''),
     streetType: new FormControl(''),
     streetName: new FormControl(''),
@@ -45,14 +51,24 @@ export class AddressDetailsComponent {
     stairNumber: new FormControl<string | null>(null),
     floorNumber: new FormControl<string | null>(null),
     apartmentNumber: new FormControl<string | null>(null),
-    countryId: new FormControl<number | null>(null),
-    countrId: new FormControl<number | null>(null),
   });
+
+  country: CatalogueItem;
+  county: CatalogueItem;
+
+  get countyLookupIsEnabled() {
+    const countyLookupIsEnabled = !!this.country.id;
+    return countyLookupIsEnabled;
+  }
 
   constructor(
     public dialogRef: MatDialogRef<AddressDetailsComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: ExtendedAddressSummary
-  ) {}
+    @Inject(MAT_DIALOG_DATA) public data: ExtendedAddressSummary,
+    private apiService: ApiService
+  ) {
+    this.country = this.getEmptyCatalogueItem();
+    this.county = this.getEmptyCatalogueItem();
+  }
 
   get isEdit() {
     const isEdit = !!this.data.id;
@@ -69,5 +85,23 @@ export class AddressDetailsComponent {
 
   onDelete(): void {
     this.dialogRef.close();
+  }
+
+  countryChanged(e: CatalogueItem) {
+    this.country = e;
+    this.county = this.getEmptyCatalogueItem();
+  }
+
+  countyChanged(e: CatalogueItem) {
+    this.county = e;
+  }
+
+  getEmptyCatalogueItem() {
+    const item: CatalogueItem = {
+      id: '',
+      name: '',
+    };
+
+    return item;
   }
 }
