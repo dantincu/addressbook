@@ -1,66 +1,128 @@
 <div class="modal-dialog">
-  <h2 mat-dialog-title>{{ (isEdit ? "Edit" : "Add") + " Address" }}</h2>
-  <div mat-dialog-content>
-    <form [formGroup]="form" (ngSubmit)="onSave()" class="app-form">
-      <mat-form-field appearance="fill" class="app-form-field grid-row-1">
-        <mat-label>First Name</mat-label>
-        <input matInput required formControlName="firstName" />
-      </mat-form-field>
-      <mat-form-field appearance="fill" class="app-form-field grid-row-2">
-        <mat-label>Middle Name</mat-label>
-        <input matInput formControlName="middleName" />
-      </mat-form-field>
-      <mat-form-field appearance="fill" class="app-form-field grid-row-3">
-        <mat-label>Last Name</mat-label>
-        <input matInput required formControlName="lastName" />
-      </mat-form-field>
-      <app-free-text-or-lookup
-        class="grid-row-4"
-        caption="Country"
-        lookupApiUrl="{{ 'countries' }}"
-        [lookupIsActive]="true"
-        [isRequired]="true"
-        labelMemberName="name"
-        idMemberName="code"
-        (currentChanged)="countryChanged($event)"
-      ></app-free-text-or-lookup>
-      <app-free-text-or-lookup
-        class="grid-row-5"
-        caption="County / State"
-        lookupApiUrl="{{ 'counties/' + country.id }}"
-        [lookupIsActive]="countyLookupIsEnabled"
-        [isRequired]="true"
-        labelMemberName="name"
-        idMemberName="id"
-        (currentChanged)="countyChanged($event)"
-      ></app-free-text-or-lookup>
-    </form>
+  <div class="modal-dialog-content" *ngIf="!isEdit || !isCallingApi">
+    <h2 mat-dialog-title class="grid-row-1">
+      {{ (isEdit ? "Edit" : "Add") + " Address" }}
+    </h2>
+    <div mat-dialog-content class="grid-row-2">
+      <form [formGroup]="form" (ngSubmit)="onSave()" class="app-form">
+        <mat-form-field appearance="fill" class="app-form-field grid-row-1">
+          <mat-label>First Name</mat-label>
+          <input matInput required formControlName="firstName" />
+        </mat-form-field>
+        <mat-form-field appearance="fill" class="app-form-field grid-row-2">
+          <mat-label>Middle Name</mat-label>
+          <input matInput formControlName="middleName" />
+        </mat-form-field>
+        <mat-form-field appearance="fill" class="app-form-field grid-row-3">
+          <mat-label>Last Name</mat-label>
+          <input matInput required formControlName="lastName" />
+        </mat-form-field>
+        <app-free-text-or-lookup
+          class="grid-row-4"
+          caption="Country"
+          lookupApiUrl="{{ 'countries' }}"
+          [lookupIsActive]="true"
+          [isRequired]="true"
+          labelMemberName="name"
+          idMemberName="code"
+          (currentChanged)="countryChanged($event)"
+        ></app-free-text-or-lookup>
+        <app-free-text-or-lookup
+          class="grid-row-5"
+          caption="County / State"
+          lookupApiUrl="{{ 'counties/' + country.id }}"
+          [lookupIsActive]="countyLookupIsEnabled"
+          [isRequired]="true"
+          labelMemberName="name"
+          idMemberName="id"
+          (currentChanged)="countyChanged($event)"
+        ></app-free-text-or-lookup>
+        <mat-form-field appearance="fill" class="app-form-field grid-row-6">
+          <mat-label>City Name</mat-label>
+          <input matInput required formControlName="cityName" />
+        </mat-form-field>
+        <mat-form-field appearance="fill" class="app-form-field grid-row-7">
+          <mat-label>Street Type</mat-label>
+          <input matInput formControlName="streetType" />
+        </mat-form-field>
+        <mat-form-field appearance="fill" class="app-form-field grid-row-8">
+          <mat-label>Street Name</mat-label>
+          <input matInput required formControlName="streetName" />
+        </mat-form-field>
+        <mat-form-field appearance="fill" class="app-form-field grid-row-9">
+          <mat-label>Street Number</mat-label>
+          <input matInput required formControlName="streetNumber" />
+        </mat-form-field>
+        <mat-form-field appearance="fill" class="app-form-field grid-row-10">
+          <mat-label>Postal Code</mat-label>
+          <input matInput formControlName="postalCode" />
+        </mat-form-field>
+        <mat-form-field appearance="fill" class="app-form-field grid-row-11">
+          <mat-label>Block Number</mat-label>
+          <input matInput formControlName="blockNumber" />
+        </mat-form-field>
+        <mat-form-field appearance="fill" class="app-form-field grid-row-12">
+          <mat-label>Stair Number</mat-label>
+          <input matInput formControlName="stairNumber" />
+        </mat-form-field>
+        <mat-form-field appearance="fill" class="app-form-field grid-row-13">
+          <mat-label>Floor Number</mat-label>
+          <input matInput formControlName="floorNumber" />
+        </mat-form-field>
+        <mat-form-field appearance="fill" class="app-form-field grid-row-14">
+          <mat-label>Apartment Number</mat-label>
+          <input matInput formControlName="apartmentNumber" />
+        </mat-form-field>
+      </form>
+    </div>
+    <div mat-dialog-actions class="dialog-actions" class="grid-row-3">
+      <button
+        mat-raised-button
+        color="primary"
+        class="save-btn"
+        (click)="onSave()"
+        [disabled]="isCallingApi"
+      >
+        Save
+      </button>
+      <button
+        mat-icon-button
+        color="primary"
+        class="close-btn outlined-icon-button"
+        (click)="onClose()"
+      >
+        <mat-icon>close</mat-icon>
+      </button>
+      <button
+        *ngIf="isEdit"
+        mat-icon-button
+        color="accent"
+        class="delete-btn outlined-icon-button"
+        (click)="onDelete()"
+        [disabled]="isCallingApi"
+      >
+        <mat-icon>delete</mat-icon>
+      </button>
+    </div>
+    <app-loading-waiter
+      *ngIf="isCallingApi"
+      class="address-loading-waiter grid-row-4"
+    ></app-loading-waiter>
   </div>
-  <div mat-dialog-actions class="dialog-actions">
-    <button
-      mat-raised-button
-      color="primary"
-      class="save-btn"
-      (click)="onSave()"
-    >
-      Save
-    </button>
-    <button
-      mat-icon-button
-      color="primary"
-      class="close-btn outlined-icon-button"
-      (click)="onClose()"
-    >
-      <mat-icon>close</mat-icon>
-    </button>
-    <button
-      *ngIf="isEdit"
-      mat-icon-button
-      color="accent"
-      class="delete-btn outlined-icon-button"
-      (click)="onDelete()"
-    >
-      <mat-icon>delete</mat-icon>
-    </button>
+  <div class="modal-dialog-content" *ngIf="isEdit && isCallingApi">
+    <div mat-dialog-actions class="dialog-actions" class="grid-row-1">
+      <button
+        mat-icon-button
+        color="primary"
+        class="close-btn outlined-icon-button"
+        (click)="onClose()"
+      >
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+    <app-loading-waiter
+      *ngIf="isCallingApi"
+      class="address-loading-waiter grid-row-2"
+    ></app-loading-waiter>
   </div>
 </div>

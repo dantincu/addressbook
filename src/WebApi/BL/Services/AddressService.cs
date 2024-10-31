@@ -71,6 +71,20 @@ namespace BL.Services
             ThrowNotFoundIfTrue(
                 entity == null);
 
+            if (entity.Country != null)
+            {
+                entity.CountryName = entity.Country.Name;
+                entity.Country = null;
+            }
+
+            if (entity.County != null)
+            {
+                entity.CountyName = entity.County.Name;
+                entity.County = null;
+            }
+
+            entity.Person.Addresses = null;
+
             return entity!;
         }
 

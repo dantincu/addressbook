@@ -21,7 +21,7 @@ import {
   ExtendedAddress,
   AddressSummary,
   ExtendedAddressSummary,
-} from '../entities/entities';
+} from '../data/entities';
 
 @Component({
   selector: 'app-address-summary',

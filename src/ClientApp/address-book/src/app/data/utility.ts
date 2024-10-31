@@ -1,5 +1,7 @@
 import { dateToDisplayStr, moveUtcDateToLocalTime } from '../services/date';
+
 import {
+  CatalogueItem,
   Address,
   AddressSummary,
   ExtendedAddress,
@@ -56,3 +58,8 @@ export const normalizeAddressSummaries = (inputData: AddressSummary[]) =>
 
 export const normalizeAddresses = (inputData: Address[]) =>
   inputData.map(normalizeAddress);
+
+export const isRequiredCatalogueItemValid = (item: CatalogueItem) => {
+  const isValid = !!(item.id || item.name);
+  return isValid;
+};

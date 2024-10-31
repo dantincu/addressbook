@@ -8,6 +8,7 @@ import {
   EventEmitter,
   Output,
 } from '@angular/core';
+
 import { CommonModule } from '@angular/common';
 import { MatDialogRef } from '@angular/material/dialog';
 import { MAT_DIALOG_DATA } from '@angular/material/dialog';
@@ -22,10 +23,7 @@ import { ApiService } from '../services/api-service/api-service.service';
 import { MatSelectModule, MatSelectChange } from '@angular/material/select';
 import { MatOptionModule } from '@angular/material/core';
 
-export interface CatalogueItem {
-  id: string;
-  name: string;
-}
+import { CatalogueItem } from '../data/entities';
 
 @Component({
   selector: 'app-free-text-or-lookup',
@@ -161,9 +159,6 @@ export class FreeTextOrLookupComponent
               id: '',
               name: this.selectionNothingOptionName ?? '',
             });
-
-            console.log('this.idMemberName', this.idMemberName);
-            console.log('this.data', this.data);
           } else {
             this.data = [];
           }

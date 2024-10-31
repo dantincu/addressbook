@@ -1,3 +1,8 @@
+export interface CatalogueItem {
+  id: string;
+  name: string;
+}
+
 export interface EntityBase<TPk> {
   id: TPk;
 }
@@ -26,11 +31,11 @@ export interface County extends EntityBase<number> {
 
 export interface Person extends EntityBase<number> {
   firstName: string;
-  middleName: string;
+  middleName?: string | null | undefined;
   lastName: string;
 }
 
-export interface Address extends EntityBase<number>, TimeStampEntity {
+export interface AddressCore {
   countryName?: string | null | undefined;
   countyName?: string | null | undefined;
   cityName: string;
@@ -42,11 +47,17 @@ export interface Address extends EntityBase<number>, TimeStampEntity {
   stairNumber?: string | null | undefined;
   floorNumber?: string | null | undefined;
   apartmentNumber?: string | null | undefined;
-  personId: number;
   countryId?: number | null | undefined;
-  countrId?: number | null | undefined;
+  countyId?: number | null | undefined;
   country?: Country | null | undefined;
   county?: County | null | undefined;
+}
+
+export interface Address
+  extends EntityBase<number>,
+    TimeStampEntity,
+    AddressCore {
+  personId: number;
   person: Person;
 }
 

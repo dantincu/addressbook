@@ -24,9 +24,9 @@ import {
   AddressSummary,
   ExtendedAddressSummary,
   AddressFilter,
-} from '../entities/entities';
+} from '../data/entities';
 
-import { normalizeAddressSummaries } from '../entities/utility';
+import { normalizeAddressSummaries } from '../data/utility';
 
 import { LoadingWaiterComponent } from '../loading-waiter/loading-waiter.component';
 
@@ -121,6 +121,7 @@ export class AddressBookComponent
 
   async deleteClicked(address: AddressSummary) {
     address.hasPendingApiCall = true;
+
     this.apiService.delete(`${this.controllerName}/${address.id}`).subscribe({
       next: () => {
         const idx = this.data!.findIndex((addr) => addr.id === address.id);
